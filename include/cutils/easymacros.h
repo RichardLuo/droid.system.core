@@ -15,10 +15,10 @@
 
 #define easyutil_hexdump(buf_addr, buf_size) do {} while(0)
 
-#define HEX_DUMP(buf,size,info_fmt, ...)        \
+#define hexdump_info(buf,size,info_fmt, ...)    \
     do {                                        \
         LOGFL(info_fmt, ## __VA_ARGS__);        \
-        hexdump_l(buf, size);                    \
+        hexdump_l(buf, size);                   \
     } while(0)
 
 #define LOG_IF_RETURN_CODE(cond,code,info_fmt, ...) \
@@ -32,7 +32,7 @@
 
 #define LOG_IFE_RETURN(error,info_fmt, ...)     \
     do {                                        \
-        if ((error) != ErrorNone) {             \
+        if ((error) != 0) {             \
             LOGFL(info_fmt, ## __VA_ARGS__);    \
             return (error);                     \
         }                                       \
@@ -62,9 +62,6 @@
             code;                               \
         }                                       \
     } while (0)
-
-// #define LOG_IF_break(cond,info_fmt, ...) LOG_IF_EXECUTE(cond,break,info_fmt, ## __VA_ARGS__)
-// #define LOG_IF_continue(cond,code,info_fmt, ...) LOG_IF_EXECUTE(cond,continue,info_fmt, ## __VA_ARGS__)
 
 #define LOG_IF_GOTO(cond,label,info_fmt, ...)   \
     do {                                        \

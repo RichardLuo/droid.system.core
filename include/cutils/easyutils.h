@@ -19,8 +19,7 @@ extern "C" {
 
     int read_n(int fd, void *data, size_t size);
 
-    void hexdump_l(const void *p, int len);
-
+    void hexdump_l(const void *data, int len);
 
 
 #ifdef __cplusplus

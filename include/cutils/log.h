@@ -106,9 +106,9 @@ extern "C" {
  * Simplified macro to send a debug log message using the current LOG_TAG.
  */
 #ifndef LOGFL
-#define LOGFL(fmt, ...)  LOG_FL(LOG_DEBUG, LOG_TAG, fmt, ## __VA_ARGS__)
-#define LOGFLV(fmt, ...) LOG_FL_THIS_TID(LOG_DEBUG, LOG_TAG, fmt, ## __VA_ARGS__)
-#define LOGFLT(fmt, ...) LOG_FL_TIMESTAMP(LOG_DEBUG, LOG_TAG, fmt, ## __VA_ARGS__)
+#define LOGFL(fmt, ...)  LOG_FL(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
+#define LOGFLV(fmt, ...) LOG_FL_THIS_TID(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
+#define LOGFLT(fmt, ...) LOG_FL_TIMESTAMP(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
 //#define LOGFL LOGV
 #endif
 
