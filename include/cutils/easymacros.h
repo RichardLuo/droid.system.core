@@ -15,10 +15,16 @@
 
 #define easyutil_hexdump(buf_addr, buf_size) do {} while(0)
 
-#define hexdump_info(buf,size,info_fmt, ...)    \
-    do {                                        \
-        LOGFL(info_fmt, ## __VA_ARGS__);        \
-        hexdump_l(buf, size);                   \
+#include "base_file_and_line.h"
+
+#define hexdump_info(buf,size,fmt, ...)                             \
+    do {                                                            \
+        int _n_; char _info_[256];                                  \
+        _n_ = snprintf(_info_, sizeof(_info_)-1, "%s(%d): " fmt,  \
+                       BASE_FILE_NAME(__FILE__), __LINE__,          \
+                       ## __VA_ARGS__);                             \
+        _info_[_n_] = 0;                                            \
+        hexdump_l(_info_, buf, size);                               \
     } while(0)
 
 #define LOG_IF_RETURN_CODE(cond,code,info_fmt, ...) \

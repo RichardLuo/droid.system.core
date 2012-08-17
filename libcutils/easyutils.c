@@ -67,7 +67,58 @@ int read_n (int fd, void *data, size_t size)
     return done_size;
 }
 
-void hexdump_l(const void *data, int len)
+static const size_t BYTES_PER_LINE = 16;
+
+const uint8_t* hexdump_one_line(size_t line_no, const uint8_t *data, size_t data_size)
+{
+    char line_buf[128];
+
+    size_t posi = 0;
+    posi += sprintf(&line_buf[posi], "%04x:\t", line_no * BYTES_PER_LINE);
+    
+    const size_t ds = data_size < BYTES_PER_LINE ? data_size : BYTES_PER_LINE;
+
+    size_t i=0;
+    for (; i < ds; ++i) {
+        posi += sprintf(&line_buf[posi], "%02x ", data[i]);
+        if ( (i+1) == BYTES_PER_LINE/2) {
+            posi += sprintf(&line_buf[posi], "  ");
+        }
+    }
+
+    for (; i < BYTES_PER_LINE; i++)
+        posi += sprintf(&line_buf[posi], "    ");
+
+    posi += sprintf(&line_buf[posi], "\t");
+
+    for (i = 0; i < ds; i++)
+        posi += sprintf(&line_buf[posi], "%c", (data[i] >= 0x20 && data[i] < 0x7f) ? data[i] : '.');
+
+    posi += sprintf(&line_buf[posi], "\n");
+
+    printf("%s", line_buf);
+
+    return &data[ds];
+}
+
+
+void hexdump_l(const char *info, const void *data, int len)
+{
+    const size_t data_size = (size_t) len;
+    const uint8_t *beg = (uint8_t*) data;
+    const uint8_t *end = &beg[data_size];
+    const uint8_t *pline = beg;
+    
+    printf("\n%s: \n", info);
+    size_t l = 0, s = data_size;
+    for ( ; (pline = hexdump_one_line(l, pline, s)) != end;
+          s = (end - pline), l++)
+        ;
+    printf("________________\n");
+}
+
+
+void hexdump_l_org(const char *info, const void *data, int len)
 {
     const uint8_t *pdata = (uint8_t*) data; 
     int thisline = 0, offset = 0, posi = 0;
@@ -97,6 +148,9 @@ void hexdump_l(const void *data, int len)
         pdata += thisline;
     }
     buf[posi] = 0;
-     printf("\n\n%s\n", buf);
+    printf("\n@@@@ %s\n", info);
+    printf("-------------------------------------------------------\n"
+           "%s", buf);
+    printf("--------------------- end of dump ---------------------\n\n");
     free(buf);
 }
