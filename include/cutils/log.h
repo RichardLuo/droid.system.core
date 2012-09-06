@@ -99,6 +99,7 @@ extern "C" {
  */
 #ifndef LOGD
 #define LOGD(...) ((void)LOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__))
+    // #define LOGD(...) LOGFL(__VA_ARGS__)
 #endif
 
 
@@ -150,6 +151,10 @@ extern "C" {
     
 #ifndef LOG_FL                   // log with file and line info
 
+#include <sys/types.h>
+#include <sys/syscall.h>  
+#define gettid() syscall(__NR_gettid)
+
 #include "base_file_and_line.h"
     
 #define LOG_FL(priority, tag, fmt, ...)                                 \
@@ -162,6 +167,18 @@ extern "C" {
         _buf_[_n_] = 0;                                                 \
         LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);                   \
     } while (0)
+
+#define LOG_FLT(priority, tag, fmt, ...)                                \
+    do {                                                                \
+        char _buf_[512];                                                \
+        const char *_file_name_ = __FILE__;                             \
+        int _n_ = snprintf(_buf_, sizeof(_buf_), "tid:%ld %s(%d)#%s " fmt, \
+                           gettid(), BASE_FILE_NAME(_file_name_), __LINE__, \
+                           BASE_FUNC_NAME(__func__), ## __VA_ARGS__);   \
+        _buf_[_n_] = 0;                                                 \
+        LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);                   \
+    } while (0)
+
 
 #define LOG_FL_THIS_TID(priority, tag, fmt, ...)                        \
     do {                                                                \
