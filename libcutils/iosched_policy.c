@@ -39,7 +39,7 @@ enum {
 #define IOPRIO_NORM 4
 
 int android_set_ioprio(int pid, IoSchedClass clazz, int ioprio) {
-#ifdef HAVE_ANDROID_OS
+#ifdef HAVE_ANDROID_OS_ARM
     if (ioprio_set(WHO_PROCESS, pid, ioprio | (clazz << CLASS_SHIFT))) {
         return -1;
     }
@@ -48,7 +48,7 @@ int android_set_ioprio(int pid, IoSchedClass clazz, int ioprio) {
 }
 
 int android_get_ioprio(int pid, IoSchedClass *clazz, int *ioprio) {
-#ifdef HAVE_ANDROID_OS
+#ifdef HAVE_ANDROID_OS_ARM
     int rc;
 
     if ((rc = ioprio_get(WHO_PROCESS, pid)) < 0) {
