@@ -26,7 +26,8 @@ extern "C" {
 time_t mktime_tz(struct tm * const tmp, char const * tz);
 void localtime_tz(const time_t * const timep, struct tm * tmp, const char* tz);
 
-#ifndef HAVE_ANDROID_OS
+    // #ifndef HAVE_ANDROID_OS
+#if 1
 /* the following is defined in <time.h> in Bionic */
 
 struct strftime_locale {
