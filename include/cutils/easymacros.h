@@ -11,7 +11,9 @@
 #ifndef _EASYMACROS_H
 #define _EASYMACROS_H
 
+#ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#endif
 
 #define easyutil_hexdump(buf_addr, buf_size) do {} while(0)
 
