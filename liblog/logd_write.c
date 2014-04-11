@@ -32,6 +32,7 @@
 #define LOG_BUF_SIZE	1024
 
 #if FAKE_LOG_DEVICE
+extern ssize_t fakeLogWritev(int fd, const struct iovec* vector, int count);
 // This will be defined when building for the host.
 #define log_open(pathname, flags) fakeLogOpen(pathname, flags)
 #define log_writev(filedes, vector, count) fakeLogWritev(filedes, vector, count)
