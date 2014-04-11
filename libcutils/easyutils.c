@@ -115,6 +115,7 @@ void hexdump_l(const char *info, const void *data, int len)
           s = (end - pline), l++)
         ;
     printf("________________\n");
+    fflush(0);
 }
 
 
