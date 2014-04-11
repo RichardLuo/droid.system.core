@@ -55,12 +55,21 @@
 
 #define LOG_IFE_RETURN(error,info_fmt, ...)     \
     do {                                        \
-        if ((error) != 0) {             \
+        int error_code = (error);               \
+        if ((error_code) != 0) {                \
             LOGFL(info_fmt, ## __VA_ARGS__);    \
-            return (error);                     \
+            return (error_code);                \
         }                                       \
     } while(0)
 
+
+#define LOG_IF_RETURN_VOID(cond,info_fmt, ...)  \
+    do {                                        \
+        if ((cond) != 0) {                      \
+            LOGFL(info_fmt, ## __VA_ARGS__);    \
+            return;                             \
+        }                                       \
+    } while(0)
 
 #define LOG_IF_RETURN(cond,info_fmt, ...)       \
     do {                                        \
