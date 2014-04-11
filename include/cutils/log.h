@@ -44,13 +44,13 @@
 extern "C" {
 #endif
 
-// ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-/*
- * Normally we strip LOGV (VERBOSE messages) from release builds.
- * You can modify this (for example with "#define LOG_NDEBUG 0"
- * at the top of your source file) to change that behavior.
- */
+    /*
+     * Normally we strip LOGV (VERBOSE messages) from release builds.
+     * You can modify this (for example with "#define LOG_NDEBUG 0"
+     * at the top of your source file) to change that behavior.
+     */
 #ifndef LOG_NDEBUG
 #ifdef NDEBUG
 #define LOG_NDEBUG 1
@@ -59,25 +59,25 @@ extern "C" {
 #endif
 #endif
 
-/*
- * This is the local tag used for the following simplified
- * logging macros.  You can change this preprocessor definition
- * before using the other macros to change the tag.
- */
+    /*
+     * This is the local tag used for the following simplified
+     * logging macros.  You can change this preprocessor definition
+     * before using the other macros to change the tag.
+     */
 #ifndef LOG_TAG
 #define LOG_TAG NULL
 #endif
 
-// ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-/*
- * Simplified macro to send a verbose log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send a verbose log message using the current LOG_TAG.
+     */
 #ifndef LOGV
 #if LOG_NDEBUG
 #define LOGV(...)   ((void)0)
 #else
-#define LOGV(...) ((void)LOG(LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
+#define LOGV(...) ((void)DROID_LOG(LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
 #endif
 #endif
 
@@ -87,64 +87,64 @@ extern "C" {
 #if LOG_NDEBUG
 #define LOGV_IF(cond, ...)   ((void)0)
 #else
-#define LOGV_IF(cond, ...)                              \
-    ( (CONDITION(cond))                                 \
-      ? ((void)LOG(LOG_VERBOSE, LOG_TAG, __VA_ARGS__))  \
+#define LOGV_IF(cond, ...)                                      \
+    ( (CONDITION(cond))                                         \
+      ? ((void)DROID_LOG(LOG_VERBOSE, LOG_TAG, __VA_ARGS__))    \
       : (void)0 )
 #endif
 #endif
 
-/*
- * Simplified macro to send a debug log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send a debug log message using the current LOG_TAG.
+     */
 #ifndef LOGD
-#define LOGD(...) ((void)LOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__))
+#define LOGD(...) ((void)DROID_LOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__))
     // #define LOGD(...) LOGFL(__VA_ARGS__)
 #endif
 
 
-/*
- * Simplified macro to send a debug log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send a debug log message using the current LOG_TAG.
+     */
 #ifndef LOGFL
 #define LOGFL(fmt, ...)  LOG_FL(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
 #define LOGFLV(fmt, ...) LOG_FL_THIS_TID(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
 #define LOGFLT(fmt, ...) LOG_FL_TIMESTAMP(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
-//#define LOGFL LOGV
+    //#define LOGFL LOGV
 #endif
 
 #ifndef LOGD_IF
-#define LOGD_IF(cond, ...)                              \
-    ( (CONDITION(cond))                                 \
-      ? ((void)LOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__))    \
+#define LOGD_IF(cond, ...)                                  \
+    ( (CONDITION(cond))                                     \
+      ? ((void)DROID_LOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__))  \
       : (void)0 )
 #endif
 
-/*
- * Simplified macro to send an info log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send an info log message using the current LOG_TAG.
+     */
 #ifndef LOGI
-#define LOGI(...) ((void)LOG(LOG_INFO, LOG_TAG, __VA_ARGS__))
+#define LOGI(...) ((void)DROID_LOG(LOG_INFO, LOG_TAG, __VA_ARGS__))
 #endif
 
 #ifndef LOGI_IF
-#define LOGI_IF(cond, ...)                          \
-    ( (CONDITION(cond))                             \
-      ? ((void)LOG(LOG_INFO, LOG_TAG, __VA_ARGS__)) \
+#define LOGI_IF(cond, ...)                                  \
+    ( (CONDITION(cond))                                     \
+      ? ((void)DROID_LOG(LOG_INFO, LOG_TAG, __VA_ARGS__))   \
       : (void)0 )
 #endif
 
-/*
- * Simplified macro to send a warning log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send a warning log message using the current LOG_TAG.
+     */
 #ifndef LOGW
-#define LOGW(...) ((void)LOG(LOG_WARN, LOG_TAG, __VA_ARGS__))
+#define LOGW(...) ((void)DROID_LOG(LOG_WARN, LOG_TAG, __VA_ARGS__))
 #endif
 
 #ifndef LOGW_IF
-#define LOGW_IF(cond, ...)                          \
-    ( (CONDITION(cond))                             \
-      ? ((void)LOG(LOG_WARN, LOG_TAG, __VA_ARGS__)) \
+#define LOGW_IF(cond, ...)                                  \
+    ( (CONDITION(cond))                                     \
+      ? ((void)DROID_LOG(LOG_WARN, LOG_TAG, __VA_ARGS__))   \
       : (void)0 )
 #endif
 
@@ -157,83 +157,88 @@ extern "C" {
 
 #include "base_file_and_line.h"
     
-#define LOG_FL(priority, tag, fmt, ...)                                 \
-    do {                                                                \
-        char _buf_[512];                                                \
-        const char *_file_name_ = __FILE__;                             \
-        int _n_ = snprintf(_buf_, sizeof(_buf_), "%s(%d)#%s " fmt,      \
-                           BASE_FILE_NAME(_file_name_), __LINE__,       \
-                           BASE_FUNC_NAME(__func__), ## __VA_ARGS__);   \
-        _buf_[_n_] = 0;                                                 \
-        LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);                   \
+#define LOGFL_BUFFER_SIZE 1024
+#define LOG_FL(priority, tag, fmt, ...)                     \
+    do {                                                    \
+        char _buf_[LOGFL_BUFFER_SIZE];                      \
+        const char *_file_name_ = __FILE__;                 \
+        const size_t _last_ = sizeof(_buf_)-1;              \
+        snprintf(_buf_, _last_, "%s(%d)#%s " fmt,           \
+                 BASE_FILE_NAME(_file_name_), __LINE__,     \
+                 BASE_FUNC_NAME(__func__), ## __VA_ARGS__); \
+        _buf_[_last_] = '\0';                               \
+        LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);       \
     } while (0)
 
-#define LOG_FLT(priority, tag, fmt, ...)                                \
-    do {                                                                \
-        char _buf_[512];                                                \
-        const char *_file_name_ = __FILE__;                             \
-        int _n_ = snprintf(_buf_, sizeof(_buf_), "tid:%ld %s(%d)#%s " fmt, \
-                           gettid(), BASE_FILE_NAME(_file_name_), __LINE__, \
-                           BASE_FUNC_NAME(__func__), ## __VA_ARGS__);   \
-        _buf_[_n_] = 0;                                                 \
-        LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);                   \
+#define LOG_FLT(priority, tag, fmt, ...)                            \
+    do {                                                            \
+        char _buf_[LOGFL_BUFFER_SIZE];                              \
+        const char *_file_name_ = __FILE__;                         \
+        const size_t _last_ = sizeof(_buf_)-1;                      \
+        snprintf(_buf_, _last_, "tid:%ld %s(%d)#%s " fmt,           \
+                 gettid(), BASE_FILE_NAME(_file_name_), __LINE__,   \
+                 BASE_FUNC_NAME(__func__), ## __VA_ARGS__);         \
+        _buf_[_last_] = '\0';                                       \
+        LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);               \
     } while (0)
 
 
-#define LOG_FL_THIS_TID(priority, tag, fmt, ...)                        \
-    do {                                                                \
-        char _buf_[512];                                                \
-        const char *_file_name_ = __FILE__;                             \
-        int _n_ = snprintf(_buf_, sizeof(_buf_), "tid:%d this:%p %s(%d)#%s " fmt, \
-                           gettid(), this,                              \
-                           BASE_FILE_NAME(_file_name_), __LINE__,       \
-                           BASE_FUNC_NAME(__func__), ## __VA_ARGS__);   \
-        _buf_[_n_] = 0;                                                 \
-        LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);                   \
+#define LOG_FL_THIS_TID(priority, tag, fmt, ...)                    \
+    do {                                                            \
+        char _buf_[LOGFL_BUFFER_SIZE];                              \
+        const char *_file_name_ = __FILE__;                         \
+        const size_t _last_ = sizeof(_buf_)-1;                      \
+        snprintf(_buf_, _last_, "tid:%d this:%p %s(%d)#%s " fmt,    \
+                 gettid(), this,                                    \
+                 BASE_FILE_NAME(_file_name_), __LINE__,             \
+                 BASE_FUNC_NAME(__func__), ## __VA_ARGS__);         \
+        _buf_[_last_] = '\0';                                       \
+        LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);               \
     } while (0)
 
-#define LOG_FL_TIMESTAMP(priority, tag, fmt, ...)                       \
-    do {                                                                \
-        char _buf_[512];                                                \
-        const char *_file_name_ = __FILE__;                             \
-        struct timeval __tv__;                                          \
-        gettimeofday(&__tv__, NULL);                                    \
-        __tv__.tv_sec %= 1000;                                          \
-        int _n_ = snprintf(_buf_, sizeof(_buf_),                        \
-                           "tid:%d this:%p ts:%ld.%03ld %s(%d)#%s " fmt, \
-                           gettid(), this,                              \
-                           __tv__.tv_sec, (__tv__.tv_usec)/1000,        \
-                           BASE_FILE_NAME(_file_name_), __LINE__,       \
-                           BASE_FUNC_NAME(__func__), ## __VA_ARGS__);   \
-        _buf_[_n_] = 0;                                                 \
-        LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);                   \
+#define LOG_FL_TIMESTAMP(priority, tag, fmt, ...)               \
+    do {                                                        \
+        char _buf_[LOGFL_BUFFER_SIZE];                          \
+        const char *_file_name_ = __FILE__;                     \
+        const size_t _last_ = sizeof(_buf_)-1;                  \
+        struct timeval __tv__;                                  \
+        gettimeofday(&__tv__, NULL);                            \
+        __tv__.tv_sec %= 1000;                                  \
+        snprintf(_buf_, _last_,                                 \
+                 "tid:%d this:%p ts:%ld.%03ld %s(%d)#%s " fmt,  \
+                 gettid(), this,                                \
+                 __tv__.tv_sec, (__tv__.tv_usec)/1000,          \
+                 BASE_FILE_NAME(_file_name_), __LINE__,         \
+                 BASE_FUNC_NAME(__func__), ## __VA_ARGS__);     \
+        _buf_[_last_] = 0;                                      \
+        LOG_PRI_PUTS(ANDROID_##priority, tag, _buf_);           \
     } while (0)
 
 #endif  // LOG_FL
 
 
 
-/*
- * Simplified macro to send an error log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send an error log message using the current LOG_TAG.
+     */
 #ifndef LOGE
-#define LOGE(...) ((void)LOG(LOG_ERROR, LOG_TAG, __VA_ARGS__))
-// #define LOGE(...) LOG_FL(LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) ((void)DROID_LOG(LOG_ERROR, LOG_TAG, __VA_ARGS__))
+    // #define LOGE(...) LOG_FL(LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #endif
 
 #ifndef LOGE_IF
-#define LOGE_IF(cond, ...)                              \
-    ( (CONDITION(cond))                                 \
-      ? ((void)LOG(LOG_ERROR, LOG_TAG, __VA_ARGS__))    \
+#define LOGE_IF(cond, ...)                                  \
+    ( (CONDITION(cond))                                     \
+      ? ((void)DROID_LOG(LOG_ERROR, LOG_TAG, __VA_ARGS__))  \
       : (void)0 )
 #endif
 
-// ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-/*
- * Conditional based on whether the current LOG_TAG is enabled at
- * verbose priority.
- */
+    /*
+     * Conditional based on whether the current LOG_TAG is enabled at
+     * verbose priority.
+     */
 #ifndef IF_LOGV
 #if LOG_NDEBUG
 #define IF_LOGV() if (false)
@@ -242,44 +247,44 @@ extern "C" {
 #endif
 #endif
 
-/*
- * Conditional based on whether the current LOG_TAG is enabled at
- * debug priority.
- */
+    /*
+     * Conditional based on whether the current LOG_TAG is enabled at
+     * debug priority.
+     */
 #ifndef IF_LOGD
 #define IF_LOGD() IF_LOG(LOG_DEBUG, LOG_TAG)
 #endif
 
-/*
- * Conditional based on whether the current LOG_TAG is enabled at
- * info priority.
- */
+    /*
+     * Conditional based on whether the current LOG_TAG is enabled at
+     * info priority.
+     */
 #ifndef IF_LOGI
 #define IF_LOGI() IF_LOG(LOG_INFO, LOG_TAG)
 #endif
 
-/*
- * Conditional based on whether the current LOG_TAG is enabled at
- * warn priority.
- */
+    /*
+     * Conditional based on whether the current LOG_TAG is enabled at
+     * warn priority.
+     */
 #ifndef IF_LOGW
 #define IF_LOGW() IF_LOG(LOG_WARN, LOG_TAG)
 #endif
 
-/*
- * Conditional based on whether the current LOG_TAG is enabled at
- * error priority.
- */
+    /*
+     * Conditional based on whether the current LOG_TAG is enabled at
+     * error priority.
+     */
 #ifndef IF_LOGE
 #define IF_LOGE() IF_LOG(LOG_ERROR, LOG_TAG)
 #endif
 
 
-// ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-/*
- * Simplified macro to send a verbose system log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send a verbose system log message using the current LOG_TAG.
+     */
 #ifndef SLOGV
 #if LOG_NDEBUG
 #define SLOGV(...)   ((void)0)
@@ -301,9 +306,9 @@ extern "C" {
 #endif
 #endif
 
-/*
- * Simplified macro to send a debug system log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send a debug system log message using the current LOG_TAG.
+     */
 #ifndef SLOGD
 #define SLOGD(...) ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
 #endif
@@ -315,9 +320,9 @@ extern "C" {
       : (void)0 )
 #endif
 
-/*
- * Simplified macro to send an info system log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send an info system log message using the current LOG_TAG.
+     */
 #ifndef SLOGI
 #define SLOGI(...) ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__))
 #endif
@@ -329,9 +334,9 @@ extern "C" {
       : (void)0 )
 #endif
 
-/*
- * Simplified macro to send a warning system log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send a warning system log message using the current LOG_TAG.
+     */
 #ifndef SLOGW
 #define SLOGW(...) ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__))
 #endif
@@ -343,9 +348,9 @@ extern "C" {
       : (void)0 )
 #endif
 
-/*
- * Simplified macro to send an error system log message using the current LOG_TAG.
- */
+    /*
+     * Simplified macro to send an error system log message using the current LOG_TAG.
+     */
 #ifndef SLOGE
 #define SLOGE(...) ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__))
 #endif
@@ -359,14 +364,14 @@ extern "C" {
 
     
 
-// ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-/*
- * Log a fatal error.  If the given condition fails, this stops program
- * execution like a normal assertion, but also generating the given message.
- * It is NOT stripped from release builds.  Note that the condition test
- * is -inverted- from the normal assert() semantics.
- */
+    /*
+     * Log a fatal error.  If the given condition fails, this stops program
+     * execution like a normal assertion, but also generating the given message.
+     * It is NOT stripped from release builds.  Note that the condition test
+     * is -inverted- from the normal assert() semantics.
+     */
 #define LOG_ALWAYS_FATAL_IF(cond, ...)                              \
     ( (CONDITION(cond))                                             \
       ? ((void)android_printAssert(#cond, LOG_TAG, __VA_ARGS__))    \
@@ -375,10 +380,10 @@ extern "C" {
 #define LOG_ALWAYS_FATAL(...)                                   \
     ( ((void)android_printAssert(NULL, LOG_TAG, __VA_ARGS__)) )
 
-/*
- * Versions of LOG_ALWAYS_FATAL_IF and LOG_ALWAYS_FATAL that
- * are stripped out of release builds.
- */
+    /*
+     * Versions of LOG_ALWAYS_FATAL_IF and LOG_ALWAYS_FATAL that
+     * are stripped out of release builds.
+     */
 #if LOG_NDEBUG
 
 #define LOG_FATAL_IF(cond, ...) ((void)0)
@@ -391,29 +396,29 @@ extern "C" {
 
 #endif
 
-/*
- * Assertion that generates a log message when the assertion fails.
- * Stripped out of release builds.  Uses the current LOG_TAG.
- */
+    /*
+     * Assertion that generates a log message when the assertion fails.
+     * Stripped out of release builds.  Uses the current LOG_TAG.
+     */
 #define LOG_ASSERT(cond, ...) LOG_FATAL_IF(!(cond), __VA_ARGS__)
-//#define LOG_ASSERT(cond) LOG_FATAL_IF(!(cond), "Assertion failed: " #cond)
+    //#define LOG_ASSERT(cond) LOG_FATAL_IF(!(cond), "Assertion failed: " #cond)
 
-/*
- * Basic log message macro.
- *
- * Example:
- *  LOG(LOG_WARN, NULL, "Failed with error %d", errno);
- *
- * The second argument may be NULL or "" to indicate the "global" tag.
- */
-#ifndef LOG
-#define LOG(priority, tag, ...)                     \
+    /*
+     * Basic log message macro.
+     *
+     * Example:
+     *  DROID_LOG(LOG_WARN, NULL, "Failed with error %d", errno);
+     *
+     * The second argument may be NULL or "" to indicate the "global" tag.
+     */
+#ifndef DROID_LOG
+#define DROID_LOG(priority, tag, ...)               \
     LOG_PRI(ANDROID_##priority, tag, __VA_ARGS__)
 #endif
 
-/*
- * Log macro that allows you to specify a number for the priority.
- */
+    /*
+     * Log macro that allows you to specify a number for the priority.
+     */
 #ifndef LOG_PRI
 #define LOG_PRI(priority, tag, ...)                 \
     android_printLog(priority, tag, __VA_ARGS__)
@@ -426,32 +431,32 @@ extern "C" {
 
 
 
-/*
- * Log macro that allows you to pass in a varargs ("args" is a va_list).
- */
+    /*
+     * Log macro that allows you to pass in a varargs ("args" is a va_list).
+     */
 #ifndef LOG_PRI_VA
 #define LOG_PRI_VA(priority, tag, fmt, args)            \
     android_vprintLog(priority, NULL, tag, fmt, args)
 #endif
 
-/*
- * Conditional given a desired logging priority and tag.
- */
+    /*
+     * Conditional given a desired logging priority and tag.
+     */
 #ifndef IF_LOG
 #define IF_LOG(priority, tag)                       \
     if (android_testLog(ANDROID_##priority, tag))
 #endif
 
-// ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-/*
- * Event logging.
- */
+    /*
+     * Event logging.
+     */
 
-/*
- * Event log entry types.  These must match up with the declarations in
- * java/android/android/util/EventLog.java.
- */
+    /*
+     * Event log entry types.  These must match up with the declarations in
+     * java/android/android/util/EventLog.java.
+     */
     typedef enum {
         EVENT_TYPE_INT      = 0,
         EVENT_TYPE_LONG     = 1,
@@ -472,13 +477,13 @@ extern "C" {
     }
 #define LOG_EVENT_STRING(_tag, _value)                                  \
     ((void) 0)  /* not implemented -- must combine len with string */
-/* TODO: something for LIST */
+    /* TODO: something for LIST */
 
-/*
- * ===========================================================================
- *
- * The stuff in the rest of this file should not be used directly.
- */
+    /*
+     * ===========================================================================
+     *
+     * The stuff in the rest of this file should not be used directly.
+     */
 
 #define android_printLog(prio, tag, fmt...)     \
     __android_log_print(prio, tag, fmt)
@@ -497,12 +502,12 @@ extern "C" {
 #define android_btWriteLog(tag, type, payload, len) \
     __android_log_btwrite(tag, type, payload, len)
 	
-// TODO: remove these prototypes and their users
+    // TODO: remove these prototypes and their users
 #define android_testLog(prio, tag) (1)
 #define android_writevLog(vec,num) do{}while(0)
 #define android_write1Log(str,len) do{}while (0)
 #define android_setMinPriority(tag, prio) do{}while(0)
-//#define android_logToCallback(func) do{}while(0)
+    //#define android_logToCallback(func) do{}while(0)
 #define android_logToFile(tag, file) (0)
 #define android_logToFd(tag, fd) (0)
 
@@ -515,9 +520,9 @@ extern "C" {
         LOG_ID_MAX
     } log_id_t;
 
-/*
- * Send a simple string to the log.
- */
+    /*
+     * Send a simple string to the log.
+     */
     int __android_log_buf_write(int bufID, int prio, const char *tag, const char *text);
     int __android_log_buf_print(int bufID, int prio, const char *tag, const char *fmt, ...);
 
