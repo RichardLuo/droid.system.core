@@ -19,14 +19,15 @@
 
 #include "base_file_and_line.h"
 
-#define hexdump_info(buf,size,fmt, ...)                             \
-    do {                                                            \
-        int _n_; char _info_[256];                                  \
-        _n_ = snprintf(_info_, sizeof(_info_)-1, "%s(%d): " fmt,  \
-                       BASE_FILE_NAME(__FILE__), __LINE__,          \
-                       ## __VA_ARGS__);                             \
-        _info_[_n_] = 0;                                            \
-        hexdump_l(_info_, buf, size);                               \
+#define hexdump_info(buf,size,fmt, ...)                 \
+    do {                                                \
+        char _info_[256];                               \
+        const size_t max = sizeof(_info_) - 1;          \
+        snprintf(_info_, max, "%s(%d): " fmt,           \
+                 BASE_FILE_NAME(__FILE__), __LINE__,    \
+                 ## __VA_ARGS__);                       \
+        _info_[max] = 0;                                \
+        hexdump_l(_info_, buf, size);                   \
     } while(0)
 
 #define LOG_IF_RETURN_CODE(cond,code,info_fmt, ...) \
