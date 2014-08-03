@@ -107,9 +107,10 @@ extern "C" {
      * Simplified macro to send a debug log message using the current LOG_TAG.
      */
 #ifndef LOGFL
-#define LOGFL(fmt, ...)  LOG_FL(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
-#define LOGFLV(fmt, ...) LOG_FL_THIS_TID(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
-#define LOGFLT(fmt, ...) LOG_FL_TIMESTAMP(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
+#define LOGFL(fmt, ...)         LOG_FLT(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
+#define LOGFLT(fmt, ...)        LOG_FL_TIMESTAMP(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
+#define LOGFLV(fmt, ...)        LOG_FL_THIS_TID(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
+#define LOGFL_this(fmt, ...)    LOG_FL_THIS_TID(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
     //#define LOGFL LOGV
 #endif
 
@@ -188,7 +189,7 @@ extern "C" {
         char _buf_[LOGFL_BUFFER_SIZE];                              \
         const char *_file_name_ = __FILE__;                         \
         const size_t _last_ = sizeof(_buf_)-1;                      \
-        snprintf(_buf_, _last_, "tid:%d this:%p %s(%d)#%s " fmt,    \
+        snprintf(_buf_, _last_, "tid:%ld this:%p %s(%d)#%s " fmt,   \
                  gettid(), this,                                    \
                  BASE_FILE_NAME(_file_name_), __LINE__,             \
                  BASE_FUNC_NAME(__func__), ## __VA_ARGS__);         \
