@@ -26,6 +26,8 @@
 #include "private/android_filesystem_config.h"
 #include "cutils/log.h"
 
+#define LOG DROID_LOG
+
 void fatal(const char *msg) {
     fprintf(stderr, "%s", msg);
     LOG(LOG_ERROR, "logwrapper", "%s", msg);
