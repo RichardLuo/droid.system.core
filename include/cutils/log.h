@@ -206,7 +206,7 @@ extern "C" {
         gettimeofday(&__tv__, NULL);                            \
         __tv__.tv_sec %= 1000;                                  \
         snprintf(_buf_, _last_,                                 \
-                 "tid:%d this:%p ts:%ld.%03ld %s(%d)#%s " fmt,  \
+                 "tid:%ld this:%p ts:%ld.%03ld %s(%d)#%s " fmt,  \
                  gettid(), this,                                \
                  __tv__.tv_sec, (__tv__.tv_usec)/1000,          \
                  BASE_FILE_NAME(_file_name_), __LINE__,         \
