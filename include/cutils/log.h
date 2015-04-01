@@ -70,16 +70,6 @@ extern "C" {
 
     // ---------------------------------------------------------------------
 
-    /*
-     * Simplified macro to send a verbose log message using the current LOG_TAG.
-     */
-#ifndef LOGV
-#if LOG_NDEBUG
-#define LOGV(...)   ((void)0)
-#else
-#define LOGV(...) ((void)DROID_LOG(LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
-#endif
-#endif
 
 #define CONDITION(cond)     (__builtin_expect((cond)!=0, 0))
 
@@ -93,15 +83,6 @@ extern "C" {
       : (void)0 )
 #endif
 #endif
-
-    /*
-     * Simplified macro to send a debug log message using the current LOG_TAG.
-     */
-#ifndef LOGD
-#define LOGD(...) ((void)DROID_LOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__))
-    // #define LOGD(...) LOGFL(__VA_ARGS__)
-#endif
-
 
     /*
      * Simplified macro to send a debug log message using the current LOG_TAG.
@@ -121,25 +102,11 @@ extern "C" {
       : (void)0 )
 #endif
 
-    /*
-     * Simplified macro to send an info log message using the current LOG_TAG.
-     */
-#ifndef LOGI
-#define LOGI(...) ((void)DROID_LOG(LOG_INFO, LOG_TAG, __VA_ARGS__))
-#endif
-
 #ifndef LOGI_IF
 #define LOGI_IF(cond, ...)                                  \
     ( (CONDITION(cond))                                     \
       ? ((void)DROID_LOG(LOG_INFO, LOG_TAG, __VA_ARGS__))   \
       : (void)0 )
-#endif
-
-    /*
-     * Simplified macro to send a warning log message using the current LOG_TAG.
-     */
-#ifndef LOGW
-#define LOGW(...) ((void)DROID_LOG(LOG_WARN, LOG_TAG, __VA_ARGS__))
 #endif
 
 #ifndef LOGW_IF
@@ -218,13 +185,48 @@ extern "C" {
 #endif  // LOG_FL
 
 
+#ifndef LOGI
+#if LOG_NDEBUG
+#define LOGI(...)   do {} while(0)
+#else
+#define LOGI(fmt, ...) LOG_FL(LOG_INFO, LOG_TAG, fmt, ## __VA_ARGS__)
+// #define LOGI(...) ((void)DROID_LOG(LOG_INFO, LOG_TAG, __VA_ARGS__))
+#endif
+#endif
 
-    /*
-     * Simplified macro to send an error log message using the current LOG_TAG.
-     */
+#ifndef LOGV
+#if LOG_NDEBUG
+#define LOGV(...)   do {} while(0)
+#else
+#define LOGV(fmt, ...) LOG_FL(LOG_VERBOSE, LOG_TAG, fmt, ## __VA_ARGS__)
+// #define LOGV(...) ((void)DROID_LOG(LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
+#endif
+#endif
+
+#ifndef LOGD
+#if LOG_NDEBUG
+#define LOGD(...)   do {} while(0)
+#else
+#define LOGD(fmt, ...) LOG_FL(LOG_DEBUG, LOG_TAG, fmt, ## __VA_ARGS__)
+// #define LOGD(...) ((void)DROID_LOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__))
+#endif
+#endif
+
+#ifndef LOGW
+#if LOG_NDEBUG
+#define LOGW(...)   do {} while(0)
+#else
+#define LOGW(fmt, ...) LOG_FL(LOG_WARN, LOG_TAG, fmt, ## __VA_ARGS__)
+#endif
+#endif
+
 #ifndef LOGE
-#define LOGE(...) ((void)DROID_LOG(LOG_ERROR, LOG_TAG, __VA_ARGS__))
-    // #define LOGE(...) LOG_FL(LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#if LOG_NDEBUG
+#define LOGE(...)   do {} while(0)
+#else
+#define LOGE(fmt, ...) LOG_FL(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
+// #define LOGE(fmt, ...) LOG_FL(LOG_ERROR, LOG_TAG, fmt, ## __VA_ARGS__)
+#endif
 #endif
 
 #ifndef LOGE_IF
