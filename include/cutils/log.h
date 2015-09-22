@@ -186,7 +186,7 @@ extern "C" {
 
 
 #ifndef LOGI
-#if LOG_NDEBUG
+#ifdef LOG_DISABLED
 #define LOGI(...)   do {} while(0)
 #else
 #define LOGI(fmt, ...) LOG_FL(LOG_INFO, LOG_TAG, fmt, ## __VA_ARGS__)
@@ -195,13 +195,17 @@ extern "C" {
 #endif
 
 #ifndef LOGV
-#if LOG_NDEBUG
+#ifdef LOG_DISABLED
 #define LOGV(...)   do {} while(0)
 #else
 #define LOGV(fmt, ...) LOG_FL(LOG_VERBOSE, LOG_TAG, fmt, ## __VA_ARGS__)
 // #define LOGV(...) ((void)DROID_LOG(LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
 #endif
 #endif
+
+// #ifndef LOG
+// #define LOG LOG_FL
+// #endif    
 
 #ifndef LOGD
 #if LOG_NDEBUG
