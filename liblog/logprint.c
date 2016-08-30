@@ -669,7 +669,7 @@ char *android_log_formatLogLine (
     struct tm* ptm;
     char timeBuf[32];
     char headerBuf[128];
-    char prefixBuf[128], suffixBuf[128];
+    char prefixBuf[1024], suffixBuf[1024];
     char priChar;
     int prefixSuffixIsHeaderFooter = 0;
     char * ret = NULL;
