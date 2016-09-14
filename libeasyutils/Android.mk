@@ -14,4 +14,8 @@ LOCAL_MODULE:= libeasyutils
 
 LOCAL_MODULE_TAGS := eng
 
+ifneq ($(TARGET_SIMULATOR),true)
+LOCAL_SHARED_LIBRARIES += libstlport libdl
+endif
+
 include $(BUILD_SHARED_LIBRARY)
