@@ -12,19 +12,24 @@
 #define _EASYUTIL_H
 
 #include <cutils/easymacros.h>
+#include <string>
+#include "format.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+int read_n_l(int fd, void *data, size_t size);
 
-    int read_n(int fd, void *data, size_t size);
+std::string hexdump_l(const void *data, int len);
 
-    void hexdump_l(const char *info, const void *data, int len);
-
-
-#ifdef __cplusplus
-}
-#endif
+#define hexdump_info(buf,size,strfmt, ...)                  \
+    do {                                                    \
+        char _info_[256];                                   \
+        const size_t _max_ = sizeof(_info_) - 1;            \
+        const int _len_ = snprintf(_info_, _max_,           \
+                                   strfmt, ## __VA_ARGS__); \
+        _info_[_len_] = '\0';                               \
+        std::string _res_(_info_, _len_);                   \
+        _res_ += hexdump_l(buf, size);                      \
+        LOGW("%s", _res_.c_str());                          \
+    } while(0)
 
 
 #endif /* _EASYUTIL_H */

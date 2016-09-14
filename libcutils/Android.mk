@@ -47,7 +47,7 @@ commonSources := \
 	threads.c \
 	sched_policy.c \
 	iosched_policy.c \
-	easyutils.c
+
 
 commonHostSources := \
         ashmem-host.c

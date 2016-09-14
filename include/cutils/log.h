@@ -551,6 +551,6 @@ extern "C" {
 }
 #endif
 
-#include <cutils/easyutils.h>
+#include <cutils/easymacros.h>
 
 #endif // _LIBS_CUTILS_LOG_H

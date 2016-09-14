@@ -20,6 +20,7 @@ ifneq ($(TARGET_SIMULATOR),true)
 else
   include $(addprefix $(LOCAL_PATH)/,$(addsuffix /Android.mk, \
 	      adb \
+		  libeasyutils \
 	      libcutils \
 	      liblog \
 	      libzipfile \

@@ -11,24 +11,15 @@
 #ifndef _EASYMACROS_H
 #define _EASYMACROS_H
 
+#include <stdint.h>
+
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #endif
 
 #define easyutil_hexdump(buf_addr, buf_size) do {} while(0)
 
-#include "base_file_and_line.h"
-
-#define hexdump_info(buf,size,fmt, ...)                 \
-    do {                                                \
-        char _info_[256];                               \
-        const size_t max = sizeof(_info_) - 1;          \
-        snprintf(_info_, max, "%s(%d): " fmt,           \
-                 BASE_FILE_NAME(__FILE__), __LINE__,    \
-                 ## __VA_ARGS__);                       \
-        _info_[max] = 0;                                \
-        hexdump_l(_info_, buf, size);                   \
-    } while(0)
+#include <cutils/base_file_and_line.h>
 
 #define LOG_IF_RETURN_CODE(cond,code,info_fmt, ...) \
     do {                                            \

@@ -23,10 +23,8 @@
 
 //#define LOG_NDEBUG 0
 #define LOG_TAG "easyutils"
+#include <cutils/easyutils.h>
 #include <cutils/log.h>
-
-/* #include <cutils/easyutils.h> */
-
 #include <sys/types.h>
 #include <unistd.h>
 #include <netdb.h>
@@ -39,7 +37,7 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <netdb.h>
-
+#include <format.h>
 
 /** 
  * @brief try the best to read @a size bytes from the fd
@@ -50,8 +48,7 @@
  * 
  * @return 1. OK: val equals @a size 2. Riched the END: 0 <= val < @a size 3. -1 on Error
  */
-int read_n (int fd, void *data, size_t size)
-{
+int read_n_l (int fd, void *data, size_t size) {
     int done_size = 0;
     const int total_size = size;
     uint8_t *pbuf = (uint8_t*)(data);
@@ -69,8 +66,7 @@ int read_n (int fd, void *data, size_t size)
 
 static const size_t BYTES_PER_LINE = 16;
 
-const uint8_t* hexdump_one_line(size_t line_no, const uint8_t *data, size_t data_size)
-{
+const uint8_t* hexdump_one_line(size_t line_no, const uint8_t *data, size_t data_size, std::string &res) {
     char line_buf[128];
 
     size_t posi = 0;
@@ -96,26 +92,27 @@ const uint8_t* hexdump_one_line(size_t line_no, const uint8_t *data, size_t data
 
     posi += sprintf(&line_buf[posi], "\n");
 
-    printf("%s", line_buf);
+    res += fmt::format("{:s}", line_buf);
 
     return &data[ds];
 }
 
 
-void hexdump_l(const char *info, const void *data, int len)
-{
-    const size_t data_size = (size_t) len;
+std::string hexdump_l(const void *data, int len) {
     const uint8_t *beg = (uint8_t*) data;
-    const uint8_t *end = &beg[data_size];
+    const uint8_t *end = &beg[len];
     const uint8_t *pline = beg;
     
-    printf("\n%s: \n", info);
-    size_t l = 0, s = data_size;
-    for ( ; (pline = hexdump_one_line(l, pline, s)) != end;
-          s = (end - pline), l++)
-        ;
-    printf("________________\n");
-    fflush(0);
+    size_t line = 0;
+    size_t size = len;
+    std::string res = "\n";
+    while ((pline = hexdump_one_line(line, pline, size, res)) != end) {
+        size = (end - pline);
+        ++line;
+    }
+    res += "________________\n";
+
+    return res;
 }
 
 
