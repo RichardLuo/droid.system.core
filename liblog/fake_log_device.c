@@ -414,8 +414,8 @@ static void showLog(LogState *state,
         const uint32_t us = tv.tv_usec%1000;
         prefixLen = snprintf(prefixBuf, sizeof(prefixBuf),
                              "[%d.%03d.%03d] %c(%5d) ", sec, ms, us, priChar, pid);
-        suffixLen = snprintf(suffixBuf, sizeof(suffixBuf),
-                             "  (%s)\n", tag);
+        strcpy(suffixBuf, "\n");
+        suffixLen = 1;
         break;
     }
     case FORMAT_THREADTIME:
