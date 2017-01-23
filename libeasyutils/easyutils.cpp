@@ -110,8 +110,6 @@ std::string hexdump_l(const void *data, int len) {
         size = (end - pline);
         ++line;
     }
-    res += "________________\n";
-
     return res;
 }
 
