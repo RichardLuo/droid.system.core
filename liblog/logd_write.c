@@ -29,7 +29,7 @@
 #include <cutils/logd.h>
 #include <cutils/log.h>
 
-#define LOG_BUF_SIZE	1024
+#define LOG_BUF_SIZE	4096
 
 #if FAKE_LOG_DEVICE
 extern ssize_t fakeLogWritev(int fd, const struct iovec* vector, int count);
