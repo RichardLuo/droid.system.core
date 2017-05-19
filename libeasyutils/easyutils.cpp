@@ -90,8 +90,6 @@ const uint8_t* hexdump_one_line(size_t line_no, const uint8_t *data, size_t data
     for (i = 0; i < ds; i++)
         posi += sprintf(&line_buf[posi], "%c", (data[i] >= 0x20 && data[i] < 0x7f) ? data[i] : '.');
 
-    posi += sprintf(&line_buf[posi], "\n");
-
     res += fmt::format("{:s}", line_buf);
 
     return &data[ds];
@@ -99,18 +97,22 @@ const uint8_t* hexdump_one_line(size_t line_no, const uint8_t *data, size_t data
 
 
 std::string hexdump_l(const void *data, int len) {
-    const uint8_t *beg = (uint8_t*) data;
-    const uint8_t *end = &beg[len];
-    const uint8_t *pline = beg;
+    if (data == NULL || len == 0) {
+        return "";
+    } else {
+        const uint8_t *beg = (uint8_t*) data;
+        const uint8_t *end = &beg[len];
+        const uint8_t *pline = beg;
     
-    size_t line = 0;
-    size_t size = len;
-    std::string res = "\n";
-    while ((pline = hexdump_one_line(line, pline, size, res)) != end) {
-        size = (end - pline);
-        ++line;
+        size_t line = 0;
+        size_t size = len;
+        std::string res = "\n";
+        while ((pline = hexdump_one_line(line, pline, size, res)) != end) {
+            size = (end - pline);
+            ++line;
+        }
+        return res;
     }
-    return res;
 }
 
 
